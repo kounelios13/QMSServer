@@ -1,0 +1,14 @@
+@QMS_HostAddress = http://localhost:5095
+
+GET {{QMS_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+ POST  {{QMS_HostAddress}}/FrontDeskDevice/Register/
+Accept: application/json
+{
+    "deviceId":"111"
+}
+
+ ###
+ 
