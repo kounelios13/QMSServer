@@ -1,5 +1,6 @@
 using QMS.DAL;
 using QMS.Db;
+using QMS.Hubs;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,11 @@ builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddDbContext<QmsDbContext>();
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<MappingProfile>();
+});
+builder.Services.AddSignalR();
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssemblyContaining<Program>();
 });
 
 var app = builder.Build();
@@ -30,5 +36,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
+app.MapHub<QueueHub>("/hubs/queue");
 
 app.Run();
