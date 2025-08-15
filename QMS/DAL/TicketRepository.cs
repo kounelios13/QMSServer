@@ -83,4 +83,16 @@ public class TicketRepository : ITicketRepository
         await _context.SaveChangesAsync();
         return ticket;
     }
+
+    public async Task ResetAll()
+    {
+        var tickets = await _context.Tickets.ToListAsync();
+        foreach (var ticket in tickets)
+        {
+            ticket.Status = TicketStatus.Pending;
+            ticket.FrontDeskTerminalId = null; // Unassign terminal
+        }
+        _context.Tickets.UpdateRange(tickets);
+        await _context.SaveChangesAsync();
+    }
 }

@@ -14,5 +14,7 @@ namespace QMS.DAL
 
         Task<Ticket> GetNextAvailableTicket(string? frontDeskTerminalId = null);
 
+        Task ResetAll();
+
     }
 }

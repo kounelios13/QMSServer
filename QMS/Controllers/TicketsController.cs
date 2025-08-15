@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QMS.DAL;
 using QMS.DTO;
+using QMS.Mediator;
 
 namespace QMS.Controllers;
 
@@ -11,10 +13,17 @@ public class TicketsController : ControllerBase
 {
     private readonly ILogger<TicketsController> _logger;
     private readonly ITicketRepository _ticketRepository;
-    public TicketsController(ILogger<TicketsController> logger, ITicketRepository ticketRepository)
+    private readonly IFrontDeskRepository _frontDeskRepository;
+    private readonly IMediator _mediator;
+
+    public TicketsController(ILogger<TicketsController> logger, ITicketRepository ticketRepository ,
+        
+        IMediator mediator , IFrontDeskRepository frontDeskRepository)
     {
         _logger = logger;
         _ticketRepository = ticketRepository;
+        _mediator = mediator;
+        _frontDeskRepository = frontDeskRepository;
     }
 
     [HttpPost("Create")]
@@ -101,9 +110,23 @@ public class TicketsController : ControllerBase
             return NotFound("No available tickets.");
         }
         _logger.LogInformation("Terminal {tId} has acquired {ticketInfo}", req.DeviceId, ticket.TicketNumber);
-
-
+        var device = _frontDeskRepository
+            .GetDeviceById(req.DeviceId);
+        await _mediator.Publish(new TicketAssignedEvent(ticket.TicketNumber, device!.DeviceName));
 
         return Ok(ticket);
     }
+
+    [HttpPost("Reset")]
+    public async Task<IActionResult> Reset()
+    {
+
+        #if DEBUG
+        await _ticketRepository.ResetAll();
+        #else
+        _logger.LogInformation("Release mode");
+        #endif
+
+        return Ok();
+    } 
 }
