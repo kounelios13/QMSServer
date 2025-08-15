@@ -116,4 +116,17 @@ public class TicketsController : ControllerBase
 
         return Ok(ticket);
     }
+
+    [HttpPost("Reset")]
+    public async Task<IActionResult> Reset()
+    {
+
+        #if DEBUG
+        await _ticketRepository.ResetAll();
+        #else
+        _logger.LogInformation("Release mode");
+        #endif
+
+        return Ok();
+    } 
 }
