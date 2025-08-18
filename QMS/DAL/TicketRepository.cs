@@ -63,7 +63,7 @@ public class TicketRepository : ITicketRepository
         }
     }
 
-    public async Task<Ticket?> GetNextAvailableTicket(string? frontDeskTerminalId = null)
+    public async Task<Ticket> GetNextAvailableTicket(string? frontDeskTerminalId = null)
     {
         var ticket = await _context.Tickets
             .Where(t => t.Status == TicketStatus.Pending)

@@ -112,7 +112,7 @@ public class TicketsController : ControllerBase
         _logger.LogInformation("Terminal {tId} has acquired {ticketInfo}", req.DeviceId, ticket.TicketNumber);
         var device = _frontDeskRepository
             .GetDeviceById(req.DeviceId);
-        await _mediator.Publish(new TicketAssignedEvent(ticket.TicketNumber, device!.DeviceName));
+        await _mediator.Publish(new TicketAssignedEvent(ticket.TicketNumber, device!.DeviceName, device!.DeviceId));
 
         return Ok(ticket);
     }
