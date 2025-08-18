@@ -11,66 +11,70 @@ using QMS.Db;
 namespace QMS.Migrations
 {
     [DbContext(typeof(QmsDbContext))]
-    [Migration("20250806141507_RelationshipTokenDesktop")]
-    partial class RelationshipTokenDesktop
+    [Migration("20250817181730_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.8");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("QMS.DAL.FrontDeskTerminal", b =>
+            modelBuilder.Entity("QMS.DTO.FrontDeskTerminal", b =>
                 {
                     b.Property<string>("DeviceId")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("DeviceName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(100)");
 
                     b.Property<string>("IPAddress")
                         .IsRequired()
                         .HasMaxLength(45)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(45)");
 
                     b.Property<DateTime>("LastSeen")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("DeviceId");
 
                     b.ToTable("FrontDeskTerminals");
                 });
 
-            modelBuilder.Entity("QMS.DAL.Ticket", b =>
+            modelBuilder.Entity("QMS.DTO.Ticket", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("FrontDeskTerminalDeviceId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("FrontDeskTerminalId")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(191)
+                        .HasColumnType("varchar(191)");
 
                     b.Property<string>("IPAddress")
                         .HasMaxLength(45)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(45)");
 
                     b.Property<DateTime>("IssuedAt")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("int")
                         .HasDefaultValue(0);
 
                     b.Property<string>("TicketNumber")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
@@ -81,20 +85,20 @@ namespace QMS.Migrations
                     b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("QMS.DAL.Ticket", b =>
+            modelBuilder.Entity("QMS.DTO.Ticket", b =>
                 {
-                    b.HasOne("QMS.DAL.FrontDeskTerminal", null)
+                    b.HasOne("QMS.DTO.FrontDeskTerminal", null)
                         .WithMany("Tickets")
                         .HasForeignKey("FrontDeskTerminalDeviceId");
 
-                    b.HasOne("QMS.DAL.FrontDeskTerminal", "FrontDeskTerminal")
+                    b.HasOne("QMS.DTO.FrontDeskTerminal", "FrontDeskTerminal")
                         .WithMany()
                         .HasForeignKey("FrontDeskTerminalId");
 
                     b.Navigation("FrontDeskTerminal");
                 });
 
-            modelBuilder.Entity("QMS.DAL.FrontDeskTerminal", b =>
+            modelBuilder.Entity("QMS.DTO.FrontDeskTerminal", b =>
                 {
                     b.Navigation("Tickets");
                 });

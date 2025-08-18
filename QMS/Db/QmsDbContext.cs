@@ -7,19 +7,20 @@ public class QmsDbContext : DbContext
 {
     public DbSet<FrontDeskTerminal> FrontDeskTerminals { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public QmsDbContext(DbContextOptions<QmsDbContext> options)
+       : base(options)
     {
-        optionsBuilder.UseSqlite("Data Source=qms.db"); // Ensure the Microsoft.EntityFrameworkCore.Sqlite package is installed  
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<FrontDeskTerminal>()
             .HasKey(f => f.DeviceId);
+            
 
         modelBuilder.Entity<FrontDeskTerminal>()
             .Property(f => f.DeviceId)
+            .HasMaxLength(191)
             .IsRequired();
 
         modelBuilder.Entity<FrontDeskTerminal>()
@@ -51,7 +52,7 @@ public class QmsDbContext : DbContext
         modelBuilder.Entity<Ticket>()
             .HasOne(t => t.FrontDeskTerminal)
             .WithMany()
-            .HasForeignKey(t => t.FrontDeskTerminalId)
+            .HasForeignKey(t => t.FrontDeskTerminalId)           
             .IsRequired(false); // Allow null for unassigned terminals
 
     }

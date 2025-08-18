@@ -1,4 +1,6 @@
-﻿namespace QMS.DTO
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace QMS.DTO
 {
     public class Ticket
     {
@@ -9,6 +11,7 @@
 
         public TicketStatus Status { get; set; } = TicketStatus.Pending;
         // Foreign key (nullable, so unassigned is allowed)
+        [MaxLength(191)]
         public string? FrontDeskTerminalId { get; set; }
 
         // Navigation property

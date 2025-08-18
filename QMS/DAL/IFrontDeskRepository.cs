@@ -8,7 +8,8 @@ namespace QMS.DAL
         void AddDevice(FrontDeskTerminal device);
         void RemoveDevice(string deviceId);
         FrontDeskTerminal? GetDeviceById(string deviceId);
-
+        
+        void UpdateDeviceLastSeen(string deviceId, DateTime lastSeen);
         bool IsDeviceNameUnique(string deviceName);
     }
 }

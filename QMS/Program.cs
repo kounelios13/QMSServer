@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+
+
+using MySql.EntityFrameworkCore.Extensions;
 using QMS.DAL;
 using QMS.Db;
 using QMS.Hubs;
@@ -21,7 +25,16 @@ builder.Services.AddOpenApi(options =>
 
 builder.Services.AddScoped<IFrontDeskRepository, FrontDeskRepository>();
 builder.Services.AddScoped<ITicketRepository, TicketRepository>();
-builder.Services.AddDbContext<QmsDbContext>();
+builder.Services.AddDbContext<QmsDbContext>( opts =>
+{
+    var devLocal = builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
+
+    if (string.IsNullOrEmpty(devLocal))
+    {
+        throw new InvalidOperationException("Connection string 'DevLocal' is not configured.");
+    }
+    _ = opts.UseMySQL(devLocal!);
+});
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<MappingProfile>();
 });
@@ -35,7 +48,6 @@ builder.Services.AddCors(options => {
     {
         policy.AllowAnyHeader();
         policy.AllowAnyMethod();
-        // #FIX make it configurable through appsettings
         policy.SetIsOriginAllowed( origin =>
         {
             return origin.StartsWith("https://localhost:7182");

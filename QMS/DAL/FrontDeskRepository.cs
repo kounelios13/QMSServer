@@ -44,4 +44,15 @@ public class FrontDeskRepository : IFrontDeskRepository
     {
         return !_context.FrontDeskTerminals.Any(d => d.DeviceName == deviceName);
     }
+
+    public void UpdateDeviceLastSeen(string deviceId, DateTime lastSeen)
+    {
+        var device = _context.FrontDeskTerminals.FirstOrDefault(d => d.DeviceId == deviceId);
+        if (device != null)
+        {
+            device.LastSeen = lastSeen;
+            _context.FrontDeskTerminals.Update(device);
+            _context.SaveChanges();
+        }
+    }
 }
