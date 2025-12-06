@@ -46,6 +46,22 @@ In `k8s/clusterissuer.yaml`, update the email address for Let's Encrypt notifica
 email: your-email@example.com
 ```
 
+### Testing with Let's Encrypt Staging (Optional)
+
+For testing purposes, you can use the Let's Encrypt staging environment which has higher rate limits and doesn't count against production limits. To use staging:
+
+1. Deploy the staging ClusterIssuer:
+   ```bash
+   kubectl apply -f k8s/clusterissuer-staging.yaml
+   ```
+
+2. Update the ingress annotation in `k8s/ingress.yaml`:
+   ```yaml
+   cert-manager.io/cluster-issuer: letsencrypt-staging
+   ```
+
+⚠️ Note: Staging certificates will show a security warning in browsers. Switch to production after testing.
+
 ## Deployment Steps
 
 ### 1. Create the Namespace
@@ -204,6 +220,10 @@ kubectl delete clusterissuer letsencrypt-prod
 - `mysql-service.yaml` - MySQL service
 - `qms-deployment.yaml` - QMS application deployment
 - `qms-service.yaml` - QMS application service
-- `clusterissuer.yaml` - Let's Encrypt certificate issuer
+- `clusterissuer.yaml` - Let's Encrypt production certificate issuer
+- `clusterissuer-staging.yaml` - Let's Encrypt staging certificate issuer (for testing)
 - `ingress.yaml` - Ingress with TLS configuration for qms.mkcodergr.eu
 - `kustomization.yaml` - Kustomize configuration for easy deployment
+- `deploy.sh` - Automated deployment script
+- `cleanup.sh` - Safe cleanup script
+- `.env.example` - Example environment configuration
