@@ -363,3 +363,10 @@ MigrationBackup/
 FodyWeavers.xsd
 
 *.db
+
+# Environment and Secret Files
+.env
+.env.local
+.env.production
+appsettings.Production.json
+appsettings.Staging.json
