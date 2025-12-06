@@ -44,14 +44,13 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<Program>();
 });
 builder.Services.AddCors(options => {
+    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+    
     options.AddDefaultPolicy(policy =>
     {
         policy.AllowAnyHeader();
         policy.AllowAnyMethod();
-        policy.SetIsOriginAllowed( origin =>
-        {
-            return origin.StartsWith("https://localhost:7182");
-        });
+        policy.WithOrigins(allowedOrigins);
         policy.AllowCredentials();
         policy.Build();
     });
