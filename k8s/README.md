@@ -25,12 +25,20 @@ Before deploying, ensure you have the following installed in your Kubernetes clu
 
 ## Configuration
 
-### Update Secret Passwords
+### ⚠️ CRITICAL: Update Secret Passwords (Required for Production)
 
-Before deploying, update the passwords in `k8s/secret.yaml`:
-- `MYSQL_ROOT_PASSWORD`
-- `MYSQL_PASSWORD`
-- Update the password in `ConnectionStrings__DefaultConnection` accordingly
+**Before deploying to production**, you **MUST** update the passwords in `k8s/secret.yaml`:
+- `MYSQL_ROOT_PASSWORD` - Replace with a strong, unique password (minimum 32 characters)
+- `MYSQL_PASSWORD` - Replace with a strong, unique password (minimum 32 characters)
+- `ConnectionStrings__DefaultConnection` - Update the password to match `MYSQL_PASSWORD`
+
+**Security Best Practices:**
+- Use a password manager to generate cryptographically secure passwords
+- Never commit real passwords to version control
+- Consider using Kubernetes secrets management solutions:
+  - [Sealed Secrets](https://github.com/bitnami-labs/sealed-secrets) - Encrypt secrets in Git
+  - [External Secrets Operator](https://external-secrets.io/) - Sync from external secret stores
+  - [SOPS](https://github.com/mozilla/sops) - Encrypted files in Git
 
 ### Update Docker Image
 
