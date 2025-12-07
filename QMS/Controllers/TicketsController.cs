@@ -1,14 +1,17 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using QMS.DAL;
 using QMS.DTO;
 using QMS.Mediator;
+using QMS.Configuration;
 
 namespace QMS.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Policy = AuthorizationPolicies.PublicPolicy)] // Requires authentication by default
 public class TicketsController : ControllerBase
 {
     private readonly ILogger<TicketsController> _logger;
@@ -27,6 +30,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("Create")]
+    [AllowAnonymous] // Allow anonymous ticket creation for public kiosks
     public async Task<IActionResult> CreateTicket()
     {
 
@@ -82,6 +86,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = AuthorizationPolicies.AdminPolicy)] // Only admins can delete tickets
     public async Task<IActionResult> DeleteTicket(Guid id)
     {
         var ticket = await _ticketRepository.GetTicketById(id);
@@ -95,6 +100,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("AcquireTicket")]
+    [Authorize(Policy = AuthorizationPolicies.FrontDeskPolicy)] // Only front desk staff can acquire tickets
     public async Task<IActionResult> AcquireTicket([FromBody] TicketAcquisitionRequest req)
     {
         if (string.IsNullOrEmpty(req.DeviceId))
@@ -118,6 +124,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("Reset")]
+    [Authorize(Policy = AuthorizationPolicies.AdminPolicy)] // Only admins can reset
     public async Task<IActionResult> Reset()
     {
 
