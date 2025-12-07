@@ -36,7 +36,7 @@ public class TicketsController : ControllerBase
 
         ticket.IssuedAt = DateTime.UtcNow;
         ticket.IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-        ticket.TicketNumber = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper(); // Generate a random ticket number
+        ticket.TicketNumber = await _ticketRepository.GenerateNextTicketNumber(); // Generate sequential ticket number
         await _ticketRepository.AddTicket(ticket);
         _logger.LogInformation($"Ticket created with ID: {ticket.Id}");
         return Ok(ticket); // Return the created ticket

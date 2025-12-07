@@ -12,9 +12,11 @@ namespace QMS.DAL
         Task UpdateTicketStatus(Guid id, TicketStatus status);
         Task DeleteTicket(Guid id);
 
-        Task<Ticket> GetNextAvailableTicket(string? frontDeskTerminalId = null);
+        Task<Ticket?> GetNextAvailableTicket(string? frontDeskTerminalId = null);
 
         Task ResetAll();
+        
+        Task<string> GenerateNextTicketNumber();
 
     }
 }
