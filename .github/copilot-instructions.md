@@ -184,3 +184,6 @@ dotnet clean && dotnet build
 - Always test database migrations before deploying to production
 - Ensure CORS settings are properly configured for production environments
 - API documentation is only available in development mode
+
+## Notes about Pull Requests
+- All Pull Requests must be made to the `dev` branch
