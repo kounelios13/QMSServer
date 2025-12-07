@@ -101,7 +101,12 @@ public class TicketRepository : ITicketRepository
     public async Task<string> GenerateNextTicketNumber()
     {
         // Use a semaphore to ensure only one thread can generate a ticket number at a time
-        await _counterLock.WaitAsync();
+        // Wait for up to 30 seconds to prevent indefinite blocking
+        if (!await _counterLock.WaitAsync(TimeSpan.FromSeconds(30)))
+        {
+            throw new TimeoutException("Timeout waiting to generate ticket number");
+        }
+        
         try
         {
             // Use a transaction to ensure atomicity
@@ -120,25 +125,21 @@ public class TicketRepository : ITicketRepository
                         LastUpdated = DateTime.UtcNow
                     };
                     await _context.TicketCounters.AddAsync(counter);
-                    await _context.SaveChangesAsync();
-
-                    // Commit transaction
-                    await transaction.CommitAsync();
-
-                    // Format ticket number as T followed by 5 digits (e.g., T00001, T00002, etc.)
-                    return $"T{counter.CurrentNumber:D5}";
                 }
-
-                // Increment the counter
-                counter.CurrentNumber++;
-                counter.LastUpdated = DateTime.UtcNow;
+                else
+                {
+                    // Increment the counter
+                    counter.CurrentNumber++;
+                    counter.LastUpdated = DateTime.UtcNow;
+                }
+                
                 await _context.SaveChangesAsync();
 
                 // Commit transaction
                 await transaction.CommitAsync();
 
                 // Format ticket number as T followed by 5 digits (e.g., T00001, T00002, etc.)
-                return $"T{counter.CurrentNumber:D5}";
+                return FormatTicketNumber(counter.CurrentNumber);
             }
             catch
             {
@@ -150,5 +151,10 @@ public class TicketRepository : ITicketRepository
         {
             _counterLock.Release();
         }
+    }
+    
+    private static string FormatTicketNumber(long ticketNumber)
+    {
+        return $"T{ticketNumber:D5}";
     }
 }
