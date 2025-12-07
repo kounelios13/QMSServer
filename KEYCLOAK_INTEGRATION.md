@@ -296,7 +296,7 @@ The application defines three authorization policies:
 | `/api/Tickets` | GET | PublicPolicy | Get all tickets |
 | `/api/Tickets/{id}` | GET | PublicPolicy | Get specific ticket |
 | `/api/Tickets/Status/{status}` | GET | PublicPolicy | Get tickets by status |
-| `/api/Tickets/{id}/Status` | PUT | PublicPolicy | Update ticket status |
+| `/api/Tickets/{id}/Status` | PUT | FrontDeskPolicy | Update ticket status (front desk/admin only) |
 | `/api/Tickets/{id}` | DELETE | AdminPolicy | Delete ticket (admin only) |
 | `/api/Tickets/AcquireTicket` | POST | FrontDeskPolicy | Acquire next ticket |
 | `/api/Tickets/Reset` | POST | AdminPolicy | Reset all tickets (admin only) |

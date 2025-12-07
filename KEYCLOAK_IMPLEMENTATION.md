@@ -116,7 +116,7 @@ This document summarizes the implementation of Keycloak authentication in the QM
 | GET /api/Tickets | PublicPolicy | ❌ No |
 | GET /api/Tickets/{id} | PublicPolicy | ❌ No |
 | GET /api/Tickets/Status/{status} | PublicPolicy | ❌ No |
-| PUT /api/Tickets/{id}/Status | PublicPolicy | ❌ No |
+| PUT /api/Tickets/{id}/Status | FrontDeskPolicy | ❌ No |
 | DELETE /api/Tickets/{id} | AdminPolicy | ❌ No |
 | POST /api/Tickets/AcquireTicket | FrontDeskPolicy | ❌ No |
 | POST /api/Tickets/Reset | AdminPolicy | ❌ No |

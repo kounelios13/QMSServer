@@ -73,11 +73,11 @@ curl -X GET "https://localhost:7182/api/Tickets" \
 - `GET /api/Tickets` - List all tickets
 - `GET /api/Tickets/{id}` - Get ticket details
 - `GET /api/Tickets/Status/{status}` - Get tickets by status
-- `PUT /api/Tickets/{id}/Status` - Update ticket status
 
 ### Front Desk Staff
 - `POST /api/FrontDeskDevice/Register` - Register device
 - `POST /api/Tickets/AcquireTicket` - Acquire next ticket
+- `PUT /api/Tickets/{id}/Status` - Update ticket status (complete tickets)
 
 ### Admin Only
 - `GET /api/FrontDeskDevice/Devices` - List all devices

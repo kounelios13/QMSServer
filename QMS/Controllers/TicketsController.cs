@@ -73,6 +73,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPut("{id}/Status")]
+    [Authorize(Policy = AuthorizationPolicies.FrontDeskPolicy)] // Only front desk staff or admins can update ticket status
     public async Task<IActionResult> UpdateTicketStatus(Guid id, [FromBody] TicketStatus status)
     {
         var ticket = await _ticketRepository.GetTicketById(id);
