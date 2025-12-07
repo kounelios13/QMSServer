@@ -95,4 +95,42 @@ public class TicketRepository : ITicketRepository
         _context.Tickets.UpdateRange(tickets);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<string> GenerateNextTicketNumber()
+    {
+        // Use a transaction to ensure atomicity and prevent race conditions
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // Get or create the ticket counter
+            var counter = await _context.TicketCounters.FindAsync(1);
+            if (counter == null)
+            {
+                counter = new TicketCounter
+                {
+                    Id = 1,
+                    CurrentNumber = 0,
+                    LastUpdated = DateTime.UtcNow
+                };
+                await _context.TicketCounters.AddAsync(counter);
+            }
+
+            // Increment the counter
+            counter.CurrentNumber++;
+            counter.LastUpdated = DateTime.UtcNow;
+            _context.TicketCounters.Update(counter);
+            await _context.SaveChangesAsync();
+
+            // Commit transaction
+            await transaction.CommitAsync();
+
+            // Format ticket number as T followed by 5 digits (e.g., T00001, T00002, etc.)
+            return $"T{counter.CurrentNumber:D5}";
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
 }

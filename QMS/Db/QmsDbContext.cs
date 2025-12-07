@@ -7,6 +7,7 @@ public class QmsDbContext : DbContext
 {
     public DbSet<FrontDeskTerminal> FrontDeskTerminals { get; set; }
     public DbSet<Ticket> Tickets { get; set; }
+    public DbSet<TicketCounter> TicketCounters { get; set; }
     public QmsDbContext(DbContextOptions<QmsDbContext> options)
        : base(options)
     {
@@ -41,6 +42,9 @@ public class QmsDbContext : DbContext
             .IsRequired()
             .HasMaxLength(50);
         modelBuilder.Entity<Ticket>()
+            .HasIndex(t => t.TicketNumber)
+            .IsUnique();
+        modelBuilder.Entity<Ticket>()
             .Property(t => t.Status)
             .HasDefaultValue(TicketStatus.Pending);
         modelBuilder.Entity<Ticket>()
@@ -54,6 +58,15 @@ public class QmsDbContext : DbContext
             .WithMany()
             .HasForeignKey(t => t.FrontDeskTerminalId)           
             .IsRequired(false); // Allow null for unassigned terminals
+
+        modelBuilder.Entity<TicketCounter>()
+            .HasKey(tc => tc.Id);
+        modelBuilder.Entity<TicketCounter>()
+            .Property(tc => tc.CurrentNumber)
+            .IsRequired();
+        modelBuilder.Entity<TicketCounter>()
+            .Property(tc => tc.LastUpdated)
+            .IsRequired();
 
     }
 }
