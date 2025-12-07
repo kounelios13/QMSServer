@@ -62,6 +62,9 @@ public class QmsDbContext : DbContext
         modelBuilder.Entity<TicketCounter>()
             .HasKey(tc => tc.Id);
         modelBuilder.Entity<TicketCounter>()
+            .Property(tc => tc.Id)
+            .ValueGeneratedNever(); // Disable auto-increment, we'll set the Id manually
+        modelBuilder.Entity<TicketCounter>()
             .Property(tc => tc.CurrentNumber)
             .IsRequired();
         modelBuilder.Entity<TicketCounter>()

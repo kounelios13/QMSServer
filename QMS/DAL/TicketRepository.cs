@@ -9,6 +9,8 @@ public class TicketRepository : ITicketRepository
 {
     private readonly QmsDbContext _context;
     private readonly IMapper _mapper;
+    private static readonly SemaphoreSlim _counterLock = new SemaphoreSlim(1, 1);
+    
     public TicketRepository(QmsDbContext context , IMapper mapper)
     {
         _context = context;
@@ -98,39 +100,55 @@ public class TicketRepository : ITicketRepository
 
     public async Task<string> GenerateNextTicketNumber()
     {
-        // Use a transaction to ensure atomicity and prevent race conditions
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        // Use a semaphore to ensure only one thread can generate a ticket number at a time
+        await _counterLock.WaitAsync();
         try
         {
-            // Get or create the ticket counter
-            var counter = await _context.TicketCounters.FindAsync(1);
-            if (counter == null)
+            // Use a transaction to ensure atomicity
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                counter = new TicketCounter
+                // Get or create the ticket counter
+                var counter = await _context.TicketCounters.FirstOrDefaultAsync(c => c.Id == 1);
+                
+                if (counter == null)
                 {
-                    Id = 1,
-                    CurrentNumber = 0,
-                    LastUpdated = DateTime.UtcNow
-                };
-                await _context.TicketCounters.AddAsync(counter);
+                    counter = new TicketCounter
+                    {
+                        Id = 1,
+                        CurrentNumber = 1, // Start at 1
+                        LastUpdated = DateTime.UtcNow
+                    };
+                    await _context.TicketCounters.AddAsync(counter);
+                    await _context.SaveChangesAsync();
+
+                    // Commit transaction
+                    await transaction.CommitAsync();
+
+                    // Format ticket number as T followed by 5 digits (e.g., T00001, T00002, etc.)
+                    return $"T{counter.CurrentNumber:D5}";
+                }
+
+                // Increment the counter
+                counter.CurrentNumber++;
+                counter.LastUpdated = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                // Commit transaction
+                await transaction.CommitAsync();
+
+                // Format ticket number as T followed by 5 digits (e.g., T00001, T00002, etc.)
+                return $"T{counter.CurrentNumber:D5}";
             }
-
-            // Increment the counter
-            counter.CurrentNumber++;
-            counter.LastUpdated = DateTime.UtcNow;
-            _context.TicketCounters.Update(counter);
-            await _context.SaveChangesAsync();
-
-            // Commit transaction
-            await transaction.CommitAsync();
-
-            // Format ticket number as T followed by 5 digits (e.g., T00001, T00002, etc.)
-            return $"T{counter.CurrentNumber:D5}";
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
-        catch
+        finally
         {
-            await transaction.RollbackAsync();
-            throw;
+            _counterLock.Release();
         }
     }
 }
