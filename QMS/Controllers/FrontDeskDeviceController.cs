@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using QMS.DAL;
 using QMS.DTO;
+using QMS.Configuration;
 
 namespace QMS.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = AuthorizationPolicies.FrontDeskPolicy)] // Requires front desk or admin role
     public class FrontDeskDeviceController : ControllerBase
     {
         private readonly ILogger<FrontDeskDeviceController> _logger;
@@ -46,6 +49,7 @@ namespace QMS.Controllers
         }
 
         [HttpGet("Devices")]
+        [Authorize(Policy = AuthorizationPolicies.AdminPolicy)] // Only admins can view all devices
         public IActionResult GetAllDevices()
         {
             var devices = _frontDeskRepository.GetAllDevices();

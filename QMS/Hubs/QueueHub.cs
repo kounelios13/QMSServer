@@ -2,6 +2,7 @@
 
 namespace QMS.Hubs;
 
+// No authorization required - allows public kiosks to connect and receive real-time updates
 public class QueueHub : Hub
 {
     private readonly ILogger<QueueHub> _logger;

@@ -54,18 +54,53 @@ set ConnectionStrings__DefaultConnection=Server=prod-server;Port=3306;Database=<
 
 See `.env.example` for more configuration options.
 
+## Authentication
+
+This application supports Keycloak authentication for securing API endpoints. SignalR hub allows anonymous connections to support public kiosk scenarios.
+
+### Keycloak Integration
+
+The application is pre-configured to work with Keycloak as an identity provider. To enable authentication:
+
+1. Set up a Keycloak instance
+2. Configure the Keycloak settings in `appsettings.json` or via environment variables
+3. Follow the comprehensive setup guide: [KEYCLOAK_INTEGRATION.md](KEYCLOAK_INTEGRATION.md)
+
+**Quick Start:**
+```bash
+# Via User Secrets (Development)
+dotnet user-secrets set "Keycloak:Authority" "http://localhost:8080"
+dotnet user-secrets set "Keycloak:Realm" "qms-realm"
+dotnet user-secrets set "Keycloak:ClientId" "qms-api"
+
+# Via Environment Variables (Production)
+export Keycloak__Authority="https://keycloak.your-domain.com"
+export Keycloak__Realm="qms-realm"
+export Keycloak__ClientId="qms-api"
+```
+
+**Authorization Roles:**
+- `qms-admin`: Full access to all endpoints
+- `qms-frontdesk`: Access to front desk operations and ticket management
+- `qms-user`: Basic authenticated access to view tickets
+
+For detailed setup instructions, role configuration, and troubleshooting, see [KEYCLOAK_INTEGRATION.md](KEYCLOAK_INTEGRATION.md).
+
 ## Security
 
 This application includes several security improvements:
+- Keycloak-based JWT authentication and authorization
+- Role-based access control (RBAC)
 - Configurable CORS origins
 - No hardcoded credentials in source code
 - Proper null reference handling
+- SignalR hub with anonymous support for public kiosks
 
 For a complete security analysis and recommendations, see [SECURITY_ANALYSIS.md](SECURITY_ANALYSIS.md).
 
 ### Security Recommendations for Production
 
-1. **Add Authentication/Authorization**: Implement JWT or ASP.NET Core Identity
+1. **✅ Authentication/Authorization**: Keycloak JWT authentication is now integrated
 2. **Enable HTTPS**: Ensure all traffic is encrypted
 3. **Use Secret Management**: Azure Key Vault, AWS Secrets Manager, or similar
 4. **Implement Rate Limiting**: Prevent API abuse

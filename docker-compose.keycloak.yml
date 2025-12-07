@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: qms-keycloak
+    command:
+      - start-dev
+    environment:
+      # Admin credentials for Keycloak
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      # Database configuration (optional, using H2 for development)
+      KC_DB: dev-mem
+      # HTTP settings
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_PORT: 8080
+      # Hostname settings
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      # Persist realm configuration (optional)
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - qms-network
+
+  mysql:
+    image: mysql:8
+    container_name: qms-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: appdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - qms-network
+
+volumes:
+  mysql_data:
+  keycloak_data:
+
+networks:
+  qms-network:
+    driver: bridge
