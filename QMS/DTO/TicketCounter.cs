@@ -5,8 +5,8 @@ namespace QMS.DTO
     public class TicketCounter
     {
         [Key]
-        public int Id { get; set; } = 1;
-        public long CurrentNumber { get; set; } = 0;
+        public int Id { get; set; }
+        public long CurrentNumber { get; set; }
         public DateTime LastUpdated { get; set; }
     }
 }

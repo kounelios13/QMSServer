@@ -118,22 +118,35 @@ public class TicketRepository : ITicketRepository
                 
                 if (counter == null)
                 {
+                    // Counter doesn't exist, create it
                     counter = new TicketCounter
                     {
                         Id = 1,
                         CurrentNumber = 1, // Start at 1
                         LastUpdated = DateTime.UtcNow
                     };
-                    await _context.TicketCounters.AddAsync(counter);
+                    
+                    try
+                    {
+                        await _context.TicketCounters.AddAsync(counter);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateException)
+                    {
+                        // In the unlikely event of a race condition, refresh and retry
+                        await _context.Entry(counter).ReloadAsync();
+                        counter.CurrentNumber++;
+                        counter.LastUpdated = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 else
                 {
-                    // Increment the counter
+                    // Increment the existing counter
                     counter.CurrentNumber++;
                     counter.LastUpdated = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
                 }
-                
-                await _context.SaveChangesAsync();
 
                 // Commit transaction
                 await transaction.CommitAsync();
