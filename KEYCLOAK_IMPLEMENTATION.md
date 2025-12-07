@@ -56,8 +56,9 @@ This document summarizes the implementation of Keycloak authentication in the QM
 ### 5. SignalR Hub Security
 
 **Updated: `/QMS/Hubs/QueueHub.cs`**
-- Applied `[Authorize(Policy = AuthorizationPolicies.PublicPolicy)]` to require authentication
-- Clients must pass JWT token via query string parameter
+- Removed authorization requirement to allow anonymous connections
+- Supports public kiosks connecting to receive real-time queue updates
+- Clients can optionally pass JWT token via query string for authenticated connections
 
 ### 6. Documentation
 
@@ -121,7 +122,7 @@ This document summarizes the implementation of Keycloak authentication in the QM
 | POST /api/Tickets/Reset | AdminPolicy | ❌ No |
 | POST /api/FrontDeskDevice/Register | FrontDeskPolicy | ❌ No |
 | GET /api/FrontDeskDevice/Devices | AdminPolicy | ❌ No |
-| WS /hubs/queue | PublicPolicy | ❌ No |
+| WS /hubs/queue | N/A | ✅ Yes (public kiosk) |
 
 ## Best Practices Implemented
 
@@ -141,8 +142,9 @@ This document summarizes the implementation of Keycloak authentication in the QM
 - Separate development and production settings
 
 ### 4. ✅ SignalR Authentication
-- JWT token passed via query string for WebSocket connections
-- Consistent authentication across HTTP and WebSocket
+- Anonymous connections allowed for public kiosks
+- Optional JWT token support for authenticated clients via query string
+- Consistent authentication model with ticket creation
 
 ### 5. ✅ Principle of Least Privilege
 - Public endpoints allow anonymous access (ticket creation)
@@ -254,7 +256,7 @@ The implementation includes a graceful fallback:
 - ✅ Role-based authorization
 - ✅ User identity tracking
 - ✅ Secured endpoints with granular access control
-- ✅ Secured SignalR connections
+- ✅ SignalR hub with anonymous support for public kiosks
 
 ## Next Steps
 

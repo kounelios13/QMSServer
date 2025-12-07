@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.Authorization;
-using QMS.Configuration;
 
 namespace QMS.Hubs;
 
-[Authorize(Policy = AuthorizationPolicies.PublicPolicy)] // Require authentication for SignalR connections
+// No authorization required - allows public kiosks to connect and receive real-time updates
 public class QueueHub : Hub
 {
     private readonly ILogger<QueueHub> _logger;

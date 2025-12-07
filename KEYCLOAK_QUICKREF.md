@@ -67,13 +67,13 @@ curl -X GET "https://localhost:7182/api/Tickets" \
 
 ### Public (No Auth)
 - `POST /api/Tickets/Create` - Create ticket from kiosk
+- `WS /hubs/queue` - SignalR connection for real-time updates
 
 ### Authenticated (Any User)
 - `GET /api/Tickets` - List all tickets
 - `GET /api/Tickets/{id}` - Get ticket details
 - `GET /api/Tickets/Status/{status}` - Get tickets by status
 - `PUT /api/Tickets/{id}/Status` - Update ticket status
-- `WS /hubs/queue` - SignalR connection
 
 ### Front Desk Staff
 - `POST /api/FrontDeskDevice/Register` - Register device
@@ -132,9 +132,11 @@ curl -X GET "https://localhost:7182/api/Tickets" \
 - ✓ Check Authority URL is correct
 - ✓ Test well-known endpoint: `GET {Authority}/realms/{Realm}/.well-known/openid-configuration`
 
-### SignalR 401 Error
-- ✓ Pass token in query string: `?access_token=YOUR_TOKEN`
-- ✓ Ensure token is not expired
+### SignalR Connection Issues
+- ✓ Verify the hub URL is correct: `/hubs/queue`
+- ✓ Check CORS settings allow your client origin
+- ✓ Ensure WebSocket support is enabled
+- ✓ Note: SignalR hub allows anonymous connections for public kiosks
 
 ## Useful Commands
 

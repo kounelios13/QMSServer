@@ -56,7 +56,7 @@ See `.env.example` for more configuration options.
 
 ## Authentication
 
-This application supports Keycloak authentication for securing API endpoints and SignalR connections. 
+This application supports Keycloak authentication for securing API endpoints. SignalR hub allows anonymous connections to support public kiosk scenarios.
 
 ### Keycloak Integration
 
@@ -94,7 +94,7 @@ This application includes several security improvements:
 - Configurable CORS origins
 - No hardcoded credentials in source code
 - Proper null reference handling
-- Secured SignalR hub connections
+- SignalR hub with anonymous support for public kiosks
 
 For a complete security analysis and recommendations, see [SECURITY_ANALYSIS.md](SECURITY_ANALYSIS.md).
 

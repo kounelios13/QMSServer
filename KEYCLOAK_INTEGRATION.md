@@ -256,7 +256,17 @@ curl -X DELETE "https://localhost:7182/api/Tickets/{ticket-id}" \
 
 ### 3. Test SignalR Connection
 
-For SignalR connections, pass the access token as a query parameter:
+SignalR connections are allowed anonymously to support public kiosks. Simply connect to the hub:
+
+```javascript
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("https://localhost:7182/hubs/queue")
+    .build();
+
+await connection.start();
+```
+
+**Optional**: If you want to pass user identity for authenticated clients, you can include the access token:
 
 ```javascript
 const connection = new signalR.HubConnectionBuilder()
@@ -292,7 +302,7 @@ The application defines three authorization policies:
 | `/api/Tickets/Reset` | POST | AdminPolicy | Reset all tickets (admin only) |
 | `/api/FrontDeskDevice/Register` | POST | FrontDeskPolicy | Register front desk device |
 | `/api/FrontDeskDevice/Devices` | GET | AdminPolicy | Get all devices (admin only) |
-| `/hubs/queue` | WebSocket | PublicPolicy | SignalR real-time updates |
+| `/hubs/queue` | WebSocket | Anonymous | SignalR real-time updates (public kiosk support) |
 
 ### Customizing Roles
 
@@ -475,14 +485,21 @@ curl -X POST "http://localhost:8080/realms/qms-realm/protocol/openid-connect/tok
   curl http://localhost:8080/realms/qms-realm/.well-known/openid-configuration
   ```
 
-### Issue: SignalR connection fails with 401
+### Issue: SignalR connection fails
+
+**Note**: SignalR hub allows anonymous connections to support public kiosks. If connections are failing, check:
 
 **Possible causes:**
-1. Token not passed in query string
-2. Token is expired
+1. Network connectivity issues
+2. Incorrect hub URL
+3. CORS misconfiguration
 
 **Solutions:**
-- Pass token as query parameter: `?access_token=YOUR_TOKEN`
+- Verify the hub URL is correct: `/hubs/queue`
+- Check CORS settings allow your client origin
+- Verify WebSocket support is enabled on your server
+- Check browser console for detailed error messages
+
 - Ensure token is valid and not expired
 
 ### Issue: CORS errors in browser
